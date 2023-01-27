@@ -39,7 +39,8 @@ def add_transaction():
     Session = sessionmaker(bind=engine)
     session = Session()
     date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    category = input('Enter the category of the transaction: ')
+    cat = ['trans', 'food', 'drink', 'shop', 'payload']
+    category = cat[int(input("trans=0, food=1, drink=2, shop=3, payload=4"))]
     amount = input('Enter the amount of the transaction: ')
     note = input('Enter the note: ')
     new_transaction = Transaction(date=date, category=category, amount=amount, note=note)
@@ -77,19 +78,23 @@ def export_to_csv():
 
 
 def main():
-    action = input('What would you like to do? (input/today/month/csv): ')
-    if action == 'i':
-        add_transaction()
-        print("Transactions saved successfully!")
-    elif action == 'c':
-        export_to_csv()
-        print("Transactions saved as csv successfully!")
-    elif action == 't':
-        return get_total_amount_today()
-    elif action == 'm':
-        return get_month_transactions()
-    else:
-        print("Thank you!")
+    while True:
+        action = input('What would you like to do? (input=i/today=t/month=m/csv=c): ')
+        if action == 'i':
+            add_transaction()
+            print("Transactions saved successfully!")
+        elif action == 'c':
+            export_to_csv()
+            print("Transactions saved as csv successfully!")
+        elif action == 't':
+            return get_total_amount_today()
+        elif action == 'm':
+            return get_month_transactions()
+        else:
+            print("Thank you!")
+        cont = input("Do you want to continue (Y/N)?")
+        if cont.upper() == 'N':
+            break
     
 if __name__ == '__main__':
     main()
