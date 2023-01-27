@@ -24,7 +24,7 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True)
     date = Column(Date)
     category = Column(String)
-    reward = Column(Integer)
+    reward = Column(Float)
     amount = Column(Float)
     note = Column(String)
 
@@ -40,12 +40,12 @@ def add_transaction():
     session = Session()
     reward = 0
     amount = 0
-    # date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    date = datetime.now()
-    cat = ['trans', 'food', 'drink', 'shop', 'sell', 'reward']
-    category = cat[int(input("trans=0, food=1, drink=2, shop=3, sell=4, reward=5: "))]
-    if category == cat[5]:
-        reward = input('Enter the HKD of the transaction: ')
+    date = input('Enter the date of the transaction (YYYY-MM-DD): ')
+    # date = datetime.now()
+    cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'reward']
+    category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, reward=6: "))]
+    if category == cat[5] or category == cat[6]:
+        reward = input('Enter the HHKD of the transaction: ')
     else:
         amount = input('Enter the HKD of the transaction: ')
     note = input('Enter the note: ')
@@ -80,11 +80,17 @@ def get_total_reward_to_month(month):
 def get_month_transactions():
     """Retrieve all transactions for monthly"""
     month = int(input('Enter the month of the transaction: '))
-    a = get_total_reward_to_month(month)- get_total_amount_to_month(month)
+    a = get_total_reward_to_month(month)
+    b = get_total_amount_to_month(month)
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    df.at[0, 'totals'] = a
-    df['totals'] = df['totals'].fillna('')
+    df.at[0, 'totalsR'] = a
+    df.at[1, 'totalsA'] = b
+    # df.at[2, 'totals'] = a-b
+    df['totalsR'] = df['totalsR'].fillna('')
+    df['totalsA'] = df['totalsA'].fillna('')
+    df = df[['date', 'category', 'reward', 'amount', 'note', 'totalsR',
+       'totalsA']]
     return df
 
 
@@ -92,12 +98,19 @@ def get_month_transactions():
 def export_to_csv():
     """Export month's transaction to a csv file"""
     month = int(input('Enter the month of the transaction: '))
-    a = get_total_reward_to_month(month)- get_total_amount_to_month(month)
+    a = get_total_reward_to_month(month)
+    b = get_total_amount_to_month(month)
     months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    df.at[0, 'totals'] = a
-    df['totals'] = df['totals'].fillna('')
+    df.at[0, 'totalsR'] = a
+    df.at[0, 'totalsA'] = b
+    # df.at[2, 'totals'] = a-b
+    
+    df['totalsR'] = df['totalsR'].fillna('')
+    df['totalsA'] = df['totalsA'].fillna('')
+    df = df[['date', 'category', 'reward', 'amount', 'note', 'totalsR',
+       'totalsA']]
     df.to_csv(f'{months[month]} transactions.csv', index=False)
 
 
