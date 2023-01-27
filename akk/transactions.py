@@ -1,5 +1,5 @@
 import psycopg2
-from sqlalchemy import create_engine, Column, Integer, String, Date, func
+from sqlalchemy import create_engine, Column, Integer, Float, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 import pandas as pd
 from datetime import datetime
@@ -24,7 +24,8 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True)
     date = Column(Date)
     category = Column(String)
-    amount = Column(Integer)
+    reward = Column(Integer)
+    amount = Column(Float)
     note = Column(String)
 
 # Create the transactions table in the database
@@ -37,13 +38,18 @@ def add_transaction():
     # Create a session to add and query data
     Session = sessionmaker(bind=engine)
     session = Session()
-    date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    # date = datetime.now()
-    cat = ['trans', 'food', 'drink', 'shop', 'payload']
-    category = cat[int(input("trans=0, food=1, drink=2, shop=3, payload=4"))]
-    amount = input('Enter the HKD of the transaction: ')
+    reward = 0
+    amount = 0
+    # date = input('Enter the date of the transaction (YYYY-MM-DD): ')
+    date = datetime.now()
+    cat = ['trans', 'food', 'drink', 'shop', 'sell', 'reward']
+    category = cat[int(input("trans=0, food=1, drink=2, shop=3, sell=4, reward=5: "))]
+    if category == cat[5]:
+        reward = input('Enter the HKD of the transaction: ')
+    else:
+        amount = input('Enter the HKD of the transaction: ')
     note = input('Enter the note: ')
-    new_transaction = Transaction(date=date, category=category, amount=amount, note=note)
+    new_transaction = Transaction(date=date, category=category, reward=reward, amount=amount, note=note)
     session.add(new_transaction)
     session.commit()
     print('Transaction added')
@@ -59,27 +65,38 @@ def get_total_amount_to_day():
 
 def get_total_amount_to_month(month):
     """Retrieve the total amount spent today"""
-    query = f"SELECT SUM(amount) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" # need change the aggregate
+    query = f"SELECT SUM(amount) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
+    return df.iloc[0][0]
+
+
+def get_total_reward_to_month(month):
+    """Retrieve the total reward spent today"""
+    query = f"SELECT SUM(reward) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
+
 
 def get_month_transactions():
     """Retrieve all transactions for monthly"""
     month = int(input('Enter the month of the transaction: '))
+    a = get_total_reward_to_month(month)- get_total_amount_to_month(month)
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    df['totals'] = get_total_amount_to_month(month)
+    df.at[0, 'totals'] = a
+    df['totals'] = df['totals'].fillna('')
     return df
 
 
 # Function for creating a csv for dashboard
 def export_to_csv():
-    """Export today's transaction to a csv file"""
+    """Export month's transaction to a csv file"""
     month = int(input('Enter the month of the transaction: '))
+    a = get_total_reward_to_month(month)- get_total_amount_to_month(month)
     months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    # df['totals'] = get_total_amount_to_month()
+    df.at[0, 'totals'] = a
+    df['totals'] = df['totals'].fillna('')
     df.to_csv(f'{months[month]} transactions.csv', index=False)
 
 
