@@ -41,7 +41,7 @@ def add_transaction():
     # date = datetime.now()
     cat = ['trans', 'food', 'drink', 'shop', 'payload']
     category = cat[int(input("trans=0, food=1, drink=2, shop=3, payload=4"))]
-    amount = input('Enter the amount of the transaction: ')
+    amount = input('Enter the HKD of the transaction: ')
     note = input('Enter the note: ')
     new_transaction = Transaction(date=date, category=category, amount=amount, note=note)
     session.add(new_transaction)
@@ -49,7 +49,7 @@ def add_transaction():
     print('Transaction added')
 
 # Function for calculating the total amount of a certain date
-def get_total_amount_today():
+def get_total_amount_to_day():
     """Retrieve the total amount spent today"""
     today = input('Enter the date of the transaction (YYYY-MM-DD): ')
     query = f"SELECT SUM(amount) FROM transactions WHERE date = '{today}'"
@@ -58,21 +58,22 @@ def get_total_amount_today():
 
 def get_month_transactions():
     """Retrieve all transactions for monthly"""
-    month = input('Enter the month of the transaction: ')
+    month = int(input('Enter the month of the transaction: '))
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    # df['totals'] = get_total_amount_today()
+    # df['totals'] = get_total_amount_to_day()
     return df
 
 
 # Function for creating a csv for dashboard
 def export_to_csv():
     """Export today's transaction to a csv file"""
-    month = input('Enter the month of the transaction: ')
+    month = int(input('Enter the month of the transaction: '))
+    months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    # df['totals'] = get_total_amount_today()
-    df.to_csv(f'0{month} transactions.csv', index=False)
+    # df['totals'] = get_total_amount_to_day()
+    df.to_csv(f'{months[month]} transactions.csv', index=False)
 
 
 def main():
@@ -85,7 +86,7 @@ def main():
             export_to_csv()
             print("Transactions saved as csv successfully!")
         elif action.upper() == 'T':
-            print(get_total_amount_today())
+            print(get_total_amount_to_day())
         elif action.upper() == 'M':
             print(get_month_transactions())
         else:
