@@ -57,8 +57,8 @@ def get_total_amount_today():
     return df.iloc[0][0]
 
 def get_month_transactions():
-    """Retrieve all transactions for today"""
-    date = input('Enter the date of the transaction MM: ')
+    """Retrieve all transactions for monthly"""
+    date = input('Enter the month of the transaction: ')
     month = date
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
@@ -80,16 +80,16 @@ def export_to_csv():
 def main():
     while True:
         action = input('What would you like to do? (input=i/today=t/month=m/csv=c): ')
-        if action == 'i':
+        if action.upper() == 'I':
             add_transaction()
             print("Transactions saved successfully!")
-        elif action == 'c':
+        elif action.upper() == 'C':
             export_to_csv()
             print("Transactions saved as csv successfully!")
-        elif action == 't':
-            return get_total_amount_today()
-        elif action == 'm':
-            return get_month_transactions()
+        elif action.upper() == 'T':
+            print(get_total_amount_today())
+        elif action.upper() == 'M':
+            print(get_month_transactions())
         else:
             print("Thank you!")
         cont = input("Do you want to continue (Y/N)?")
