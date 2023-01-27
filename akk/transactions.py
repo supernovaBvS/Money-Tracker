@@ -2,16 +2,15 @@ import psycopg2
 from sqlalchemy import create_engine, Column, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 import pandas as pd
-import datetime
 from datetime import datetime
 
-# Connect to the database
-connection = psycopg2.connect(
-    host="localhost",
-    user="postgres",
-    password="postgres",
-    database="transaction"
-)
+# # Connect to the database
+# connection = psycopg2.connect(
+#     host="localhost",
+#     user="postgres",
+#     password="postgres",
+#     database="transaction"
+# )
 
 # Create a SQLAlchemy engine to handle database operations
 engine = create_engine('postgresql://postgres:postgres@localhost:5432/transaction')
@@ -39,6 +38,7 @@ def add_transaction():
     Session = sessionmaker(bind=engine)
     session = Session()
     date = input('Enter the date of the transaction (YYYY-MM-DD): ')
+    # date = datetime.now()
     cat = ['trans', 'food', 'drink', 'shop', 'payload']
     category = cat[int(input("trans=0, food=1, drink=2, shop=3, payload=4"))]
     amount = input('Enter the amount of the transaction: ')
@@ -58,8 +58,7 @@ def get_total_amount_today():
 
 def get_month_transactions():
     """Retrieve all transactions for monthly"""
-    date = input('Enter the month of the transaction: ')
-    month = date
+    month = input('Enter the month of the transaction: ')
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     # df['totals'] = get_total_amount_today()
@@ -69,12 +68,11 @@ def get_month_transactions():
 # Function for creating a csv for dashboard
 def export_to_csv():
     """Export today's transaction to a csv file"""
-    date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    month = date.split('-')[1]
+    month = input('Enter the month of the transaction: ')
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     # df['totals'] = get_total_amount_today()
-    df.to_csv(f'{month}transactions.csv', index=False)
+    df.to_csv(f'0{month} transactions.csv', index=False)
 
 
 def main():
@@ -96,5 +94,6 @@ def main():
         if cont.upper() == 'N':
             break
     
+
 if __name__ == '__main__':
     main()
