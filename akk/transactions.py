@@ -56,12 +56,19 @@ def get_total_amount_to_day():
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
+
+def get_total_amount_to_month(month):
+    """Retrieve the total amount spent today"""
+    query = f"SELECT SUM(amount) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" # need change the aggregate
+    df = pd.read_sql(query, engine)
+    return df.iloc[0][0]
+
 def get_month_transactions():
     """Retrieve all transactions for monthly"""
     month = int(input('Enter the month of the transaction: '))
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    # df['totals'] = get_total_amount_to_day()
+    df['totals'] = get_total_amount_to_month(month)
     return df
 
 
@@ -72,7 +79,7 @@ def export_to_csv():
     months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
-    # df['totals'] = get_total_amount_to_day()
+    # df['totals'] = get_total_amount_to_month()
     df.to_csv(f'{months[month]} transactions.csv', index=False)
 
 
