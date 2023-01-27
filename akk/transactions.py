@@ -72,7 +72,8 @@ def export_to_csv():
     df = pd.read_sql(query, engine)
     df.to_csv(f'{today}transactions.csv', index=False)
 
-while True:
+
+def main():
     action = input('What would you like to do? (input/csv): ')
     if action == 'i':
         add_transaction()
@@ -80,5 +81,6 @@ while True:
         export_to_csv()
     else:
         print("Transactions saved successfully!")
-        break
     
+if __name__ == '__main__':
+    main()
