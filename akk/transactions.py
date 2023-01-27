@@ -1,7 +1,6 @@
 import psycopg2
 from sqlalchemy import create_engine, Column, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import datetime
 from datetime import datetime
@@ -32,14 +31,15 @@ class Transaction(Base):
 # Create the transactions table in the database
 Base.metadata.create_all(engine)
 
-# Create a session to add and query data
-Session = sessionmaker(bind=engine)
-session = Session()
 
 # Function for inputting a new transaction
 def add_transaction():
+    from sqlalchemy.orm import sessionmaker
+    # Create a session to add and query data
+    Session = sessionmaker(bind=engine)
+    session = Session()
     # date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    date = datetime.now()
+    date = datetime.now().date()
     category = input('Enter the category of the transaction: ')
     amount = input('Enter the amount of the transaction: ')
     note = input('Enter the note: ')
@@ -74,9 +74,9 @@ def export_to_csv():
 
 while True:
     action = input('What would you like to do? (input/csv): ')
-    if action == 'input':
+    if action == 'i':
         add_transaction()
-    elif action == 'csv':
+    elif action == 'c':
         export_to_csv()
     else:
         print("Transactions saved successfully!")
