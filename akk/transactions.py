@@ -66,12 +66,13 @@ def get_total_amount_to_day():
 def get_total_amount_to_month(month):
     """Retrieve the total amount spent today"""
     query = f"SELECT SUM(amount) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
+    df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
 
 def get_total_reward_to_month(month):
     """Retrieve the total reward spent today"""
-    query = f"SELECT SUM(reward) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
+    query = f"SELECT SUM(reward) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" 
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
