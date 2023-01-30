@@ -45,7 +45,7 @@ def add_transaction():
     cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'reward']
     category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, reward=6: "))]
     if category == cat[5] or category == cat[6]:
-        reward = input('Enter the HHKD of the transaction: ')
+        reward = input('Enter the HKD of the transaction: ')
     else:
         amount = input('Enter the HKD of the transaction: ')
     note = input('Enter the note: ')
@@ -85,13 +85,13 @@ def get_month_transactions():
     query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     df.at[0, 'totalsR'] = a
-    df.at[1, 'totalsA'] = b
-    # df.at[2, 'totals'] = a-b
+    df.at[0, 'totalsA'] = b
+    # df.at[2, 'totals'] = a-b``
     df['totalsR'] = df['totalsR'].fillna('')
     df['totalsA'] = df['totalsA'].fillna('')
     df = df[['date', 'category', 'reward', 'amount', 'note', 'totalsR',
        'totalsA']]
-    return df
+    return df.sort_values(by='date', ascending=False)
 
 
 # Function for creating a csv for dashboard
