@@ -60,7 +60,11 @@ def add_transaction():
 # Function for calculating the total amount of a certain date
 def get_total_amount_to_day():
     """Retrieve the total amount spent today"""
-    today = input('Enter the date of the transaction (YYYY-MM-DD): ')
+    d = input('today=t or specified date=s? ')
+    if d.upper() == 'T':
+        today = datetime.now()
+    else:
+        today = input('Enter the date of the transaction (YYYY-MM-DD): ')
     query = f"SELECT SUM(amount) FROM transactions WHERE date = '{today}'"
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
