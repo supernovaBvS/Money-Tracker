@@ -40,7 +40,7 @@ def add_transaction():
     session = Session()
     reward = 0
     amount = 0
-    d = input('today=t or specified date? ')
+    d = input('today=t or specified date=s? ')
     if d.upper() == 'T':
         date = datetime.now()
     else:
