@@ -40,8 +40,11 @@ def add_transaction():
     session = Session()
     reward = 0
     amount = 0
-    date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    # date = datetime.now()
+    d = input('today=t or specified date? ')
+    if d.upper() == 'T':
+        date = datetime.now()
+    else:
+        date = input('Enter the date of the transaction (YYYY-MM-DD): ')
     cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'reward']
     category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, reward=6: "))]
     if category == cat[5] or category == cat[6]:
