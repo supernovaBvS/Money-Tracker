@@ -24,8 +24,8 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True)
     date = Column(Date)
     category = Column(String)
-    reward = Column(Float)
-    amount = Column(Float)
+    income = Column(Float)
+    outcome = Column(Float)
     note = Column(String)
 
 # Create the transactions table in the database
@@ -38,21 +38,21 @@ def add_transaction():
     # Create a session to add and query data
     Session = sessionmaker(bind=engine)
     session = Session()
-    reward = 0
-    amount = 0
+    income = 0
+    outcome = 0
     d = input('today=t or specified date=s? ')
     if d.upper() == 'T':
         date = datetime.now()
     else:
         date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'reward']
-    category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, reward=6: "))]
+    cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'income']
+    category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, income=6: "))]
     if category == cat[5] or category == cat[6]:
-        reward = input('Enter the HKD of the transaction: ')
+        income = input('Enter the HKD of the transaction: ')
     else:
-        amount = input('Enter the HKD of the transaction: ')
+        outcome = input('Enter the HKD of the transaction: ')
     note = input('Enter the note: ')
-    new_transaction = Transaction(date=date, category=category, reward=reward, amount=amount, note=note)
+    new_transaction = Transaction(date=date, category=category, income=income, outcome=outcome, note=note)
     session.add(new_transaction)
     session.commit()
     print('Transaction added')
@@ -65,21 +65,21 @@ def get_total_amount_to_day():
         today = datetime.now()
     else:
         today = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    query = f"SELECT SUM(amount) FROM transactions WHERE date = '{today}'"
+    query = f"SELECT SUM(outcome) FROM transactions WHERE date = '{today}'"
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
 
 def get_total_amount_to_month(month):
     """Retrieve the total amount spent today"""
-    query = f"SELECT SUM(amount) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
+    query = f"SELECT SUM(outcome) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
 
 def get_total_reward_to_month(month):
     """Retrieve the total reward spent today"""
-    query = f"SELECT SUM(reward) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" 
+    query = f"SELECT SUM(income) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" 
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
@@ -96,7 +96,7 @@ def get_month_transactions():
     # df.at[2, 'totals'] = a-b``
     df['totalsR'] = df['totalsR'].fillna('')
     df['totalsA'] = df['totalsA'].fillna('')
-    df = df[['date', 'category', 'reward', 'amount', 'note', 'totalsR',
+    df = df[['date', 'category', 'income', 'outcome', 'note', 'totalsR',
        'totalsA']]
     return df.sort_values(by='date', ascending=False)
 
@@ -108,7 +108,7 @@ def export_to_csv():
     a = get_total_reward_to_month(month)
     b = get_total_amount_to_month(month)
     months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
-    query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
+    query = f"SELECT * FROM transactions WHERE EXTRACT(MONTH FROM date) = {month} order by date DESC"
     df = pd.read_sql(query, engine)
     df.at[0, 'totalsR'] = a
     df.at[0, 'totalsA'] = b
@@ -116,7 +116,7 @@ def export_to_csv():
     
     df['totalsR'] = df['totalsR'].fillna('')
     df['totalsA'] = df['totalsA'].fillna('')
-    df = df[['date', 'category', 'reward', 'amount', 'note', 'totalsR',
+    df = df[['date', 'category', 'income', 'outcome', 'note', 'totalsR',
        'totalsA']]
     df.to_csv(f'{months[month]} transactions.csv', index=False)
 
