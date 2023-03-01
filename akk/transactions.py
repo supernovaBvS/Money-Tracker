@@ -34,6 +34,15 @@ Base.metadata.create_all(engine)
 
 # Function for inputting a new transaction
 def add_transaction():
+    """Adds a new transaction to the database.
+
+    Prompts the user to enter the transaction details, such as the transaction date, category,
+    income/outcome amount, and note. The function then creates a new Transaction object with
+    the entered details and adds it to the database.
+
+    Returns:
+    None
+    """
     from sqlalchemy.orm import sessionmaker
     # Create a session to add and query data
     Session = sessionmaker(bind=engine)
@@ -59,7 +68,21 @@ def add_transaction():
 
 # Function for calculating the total amount of a certain date
 def get_total_amount_to_day():
-    """Retrieve the total amount spent today"""
+    """
+    Retrieves the total amount spent for a specific month.
+
+    Args:
+    - month (int): The number of the month for which to retrieve the total amount spent.
+
+    Returns:
+    - The total amount spent for the specified month as a float.
+
+    Raises:
+    - None
+
+    Example:
+    - get_total_amount_to_month(8) returns 500.0 if the total amount spent in August is 500.0.
+    """
     d = input('today=t or specified date=s? ')
     if d.upper() == 'T':
         today = datetime.now()
@@ -71,21 +94,61 @@ def get_total_amount_to_day():
 
 
 def get_total_amount_to_month(month):
-    """Retrieve the total amount spent today"""
+    """
+    Retrieve the total amount spent in the given month.
+
+    Args:
+        month (int): The month for which to retrieve the total amount spent (1-12).
+
+    Returns:
+        float: The total amount spent in the given month, as a float.
+
+    Raises:
+        None.
+
+    Examples:
+        >>> get_total_amount_to_month(1)
+        100.0
+        >>> get_total_amount_to_month(12)
+        250.0
+    """
     query = f"SELECT SUM(outcome) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}"
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
 
 def get_total_reward_to_month(month):
-    """Retrieve the total reward spent today"""
+    """
+    Retrieve the total income spent in a given month.
+
+    Args:
+    month (int): The month to retrieve the total income spent for. Should be a number between 1 and 12.
+
+    Returns:
+    float: The total income spent for the given month.
+
+    Raises:
+    None.
+
+    Examples:
+    >>> get_total_reward_to_month(1)
+    500.0
+
+    """
     query = f"SELECT SUM(income) FROM transactions WHERE EXTRACT(MONTH FROM date) = {month}" 
     df = pd.read_sql(query, engine)
     return df.iloc[0][0]
 
 
 def get_month_transactions():
-    """Retrieve all transactions for monthly"""
+    """
+    Retrieve all transactions for a specific month, including the total income and total expenses.
+    
+    Returns:
+        pandas.DataFrame: A pandas DataFrame containing the transactions for the specified month, sorted in descending order by date. 
+                           The DataFrame contains the following columns: date, category, income, outcome, note, totalsR, totalsA.
+                           The totalsR and totalsA columns show the total income and total expenses for the specified month, respectively.
+    """
     month = int(input('Enter the month of the transaction: '))
     a = get_total_reward_to_month(month)
     b = get_total_amount_to_month(month)
@@ -103,7 +166,20 @@ def get_month_transactions():
 
 # Function for creating a csv for dashboard
 def export_to_csv():
-    """Export month's transaction to a csv file"""
+    """
+    Export month's transaction to a csv file
+
+    This function prompts the user to enter the month of the transactions they would like to export, then retrieves all transactions
+    for that month from the database, calculates the total income and outcome for the month and adds these totals to the dataframe. 
+    The resulting dataframe is sorted by date in descending order and exported to a csv file named after the month in the format
+    '<Month Name> transactions.csv'. The csv file is saved to the current working directory.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     month = int(input('Enter the month of the transaction: '))
     a = get_total_reward_to_month(month)
     b = get_total_amount_to_month(month)
@@ -123,21 +199,20 @@ def export_to_csv():
 
 def main():
     while True:
-        action = input('What would you like to do? (input=i/today=t/month=m/csv=c): ')
-        if action.upper() == 'I':
+        action = input('What would you like to do? (input=i/today=t/month=m/csv=c): ').upper()
+        if action == 'I':
             add_transaction()
             print("Transactions saved successfully!")
-        elif action.upper() == 'C':
+        elif action == 'C':
             export_to_csv()
             print("Transactions saved as csv successfully!")
-        elif action.upper() == 'T':
+        elif action == 'T':
             print(get_total_amount_to_day())
-        elif action.upper() == 'M':
+        elif action == 'M':
             print(get_month_transactions())
         else:
             print("Thank you!")
-        cont = input("Do you want to continue (Y/N)?")
-        if cont.upper() == 'N':
+        if input("Do you want to continue (Y/N)?").upper() == 'N':
             break
     
 
