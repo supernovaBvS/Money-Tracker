@@ -49,15 +49,15 @@ def add_transaction():
     session = Session()
     income = 0
     outcome = 0
-    d = input('today=t or specified date=s or yesterday=y? ')
-    if d.upper() == 'T':
+    d = input('today=t or specified date=s or yesterday=y? ').upper()
+    if d == 'T':
         date = datetime.now()
-    elif d.upper() == 'Y':
+    elif d == 'Y':
         date = datetime.datetime.now().date() - datetime.timedelta(days=1)
     else:
         date = input('Enter the date of the transaction (YYYY-MM-DD): ')
-    cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'income']
-    category = cat[int(input("trans=0, food=1, drink=2, shop=3, ran=4, sell=5, income=6: "))]
+    cat = ['trans', 'food', 'drink', 'shop', 'others', 'sell', 'income']
+    category = cat[int(input("trans=0, food=1, drink=2, shop=3, others=4, sell=5, income=6: "))]
     if category == cat[5] or category == cat[6]:
         income = input('Enter the HKD of the transaction: ')
     else:
@@ -86,9 +86,11 @@ def get_total_amount_to_day():
     >>> get_total_amount_to_day(2023-02-28) returns 500.0 
     if the total amount spent in 2023-02-28 is 500.0.
     """
-    d = input('today=t or specified date=s? ')
-    if d.upper() == 'T':
+    d = input('today=t or specified date=s or yesterday=y? ').upper()
+    if d == 'T':
         today = datetime.now()
+    elif d == 'Y':
+        today = datetime.datetime.now().date() - datetime.timedelta(days=1)
     else:
         today = input('Enter the date of the transaction (YYYY-MM-DD): ')
     query = f"SELECT SUM(outcome) FROM transactions WHERE date = '{today}'"
