@@ -2,7 +2,7 @@ import psycopg2
 from sqlalchemy import create_engine, Column, Integer, Float, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 import pandas as pd
-from datetime import datetime
+import datetime
 
 # # Connect to the database
 # connection = psycopg2.connect(
@@ -49,9 +49,11 @@ def add_transaction():
     session = Session()
     income = 0
     outcome = 0
-    d = input('today=t or specified date=s? ')
+    d = input('today=t or specified date=s or yesterday=y? ')
     if d.upper() == 'T':
         date = datetime.now()
+    elif d.upper() == 'Y':
+        date = datetime.datetime.now().date() - datetime.timedelta(days=1)
     else:
         date = input('Enter the date of the transaction (YYYY-MM-DD): ')
     cat = ['trans', 'food', 'drink', 'shop', 'ran', 'sell', 'income']
@@ -69,7 +71,7 @@ def add_transaction():
 # Function for calculating the total amount of a certain date
 def get_total_amount_to_day():
     """
-    Retrieves the total amount spent for a specific month.
+    Retrieves the total amount spent for a specific date.
 
     Args:
     - month (int): The number of the month for which to retrieve the total amount spent.
@@ -81,7 +83,8 @@ def get_total_amount_to_day():
     - None
 
     Example:
-    - get_total_amount_to_month(8) returns 500.0 if the total amount spent in August is 500.0.
+    >>> get_total_amount_to_day(2023-02-28) returns 500.0 
+    if the total amount spent in 2023-02-28 is 500.0.
     """
     d = input('today=t or specified date=s? ')
     if d.upper() == 'T':
