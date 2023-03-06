@@ -68,6 +68,7 @@ def add_transaction():
     session.commit()
     print('Transaction added')
 
+
 # Function for calculating the total amount of a certain date
 def get_total_amount_to_day():
     """
@@ -167,6 +168,26 @@ def get_month_transactions():
     df = df[['date', 'category', 'income', 'outcome', 'note', 'totalsR',
        'totalsA']]
     return df.sort_values(by='date', ascending=False)
+
+
+'''
+
+def forjanny():
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 
 
 # Function for creating a csv for dashboard
