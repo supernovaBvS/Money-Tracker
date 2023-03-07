@@ -51,7 +51,7 @@ def add_transaction():
     outcome = 0
     d = input('today=t or specified date=s or yesterday=y? ').upper()
     if d == 'T':
-        date = datetime.now()
+        date = datetime.datetime.now()
     elif d == 'Y':
         date = datetime.datetime.now().date() - datetime.timedelta(days=1)
     else:
@@ -89,7 +89,7 @@ def get_total_amount_to_day():
     """
     d = input('today=t or specified date=s or yesterday=y? ').upper()
     if d == 'T':
-        today = datetime.now()
+        today = datetime.datetime.now()
     elif d == 'Y':
         today = datetime.datetime.now().date() - datetime.timedelta(days=1)
     else:
